@@ -3,21 +3,14 @@ android {
         debug {
             storeFile file('signing/debug.jks')
         }
-        upload {
-            storeFile file('signing/upload.jks')
-            storePassword System.env.UPLOAD_KEYSTORE_PWD ?: ''
-            keyAlias 'upload'
-            keyPassword System.env.UPLOAD_KEYSTORE_PWD ?: ''
-        }
+        upload {}
     }
 
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
         }
-        release {
-            signingConfig signingConfigs.upload
-        }
+        release {}
     }
 }
 
@@ -33,24 +26,15 @@ project.afterEvaluate {
     final publish = 'publishSample'
 
     project.task publish
-    project.tasks[publish].dependsOn 'decryptUploadKeystore'
     project.tasks[publish].dependsOn 'decryptPlayAccount'
     project.tasks[publish].dependsOn 'publishReleaseBundle'
     project.tasks[publish].finalizedBy 'cleanUploadKeystore'
     project.tasks[publish].finalizedBy 'cleanPlayAccount'
 }
 
-task decryptUploadKeystore {
-    doFirst {
-        println 'Decrypt upload keystore'
-        decode('upload.jks')
-    }
-}
-
 task cleanUploadKeystore {
     doLast {
         println 'Clean up upload keystore'
-        cleanup('upload.jks')
     }
 }
 
